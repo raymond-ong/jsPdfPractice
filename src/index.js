@@ -8,36 +8,19 @@ import canvgX from 'canvg';
 
 
 var doc = new jsPDF();
-// debugger
-// html2canvas(document.getElementById('root'), {
-//     // this does not work
-//     onrendered: function(canvas) {
-//         // debugger
-//         var img = canvas.toDataURL(); //image data of canvas
-//         var doc = new jsPDF();
-//         doc.addImage(img, 10, 10);
-//         //doc.save('test.pdf');
-//     }
-// })
-
-// html2canvas(document.getElementById('mypie1'), {
-//         scale: 2
-//     }
-// ).then(function(canvas) {
-//     //debugger
-//     var img = canvas.toDataURL(); //image data of canvas
-//     var doc = new jsPDF();
-//     doc.addImage(img, 10, 10);
-//     //doc.save('test.pdf');    
-// });
-// doc.fromHTML(ReactDOMServer.renderToStaticMarkup(<App/>));
-
-//doc.save("myDocument.pdf");
 
 const covertToMm = val => val / 3.7795275591;
   
 const onSave = () => {
     console.log('start save');
+    //tryRenderSvgElems();
+    tryHtmlRender();
+
+    console.log('end save');
+}
+
+// Manually render items
+const tryRenderSvgElems = () => {
     let p1 = html2canvas(document.getElementById('mypie1'));
     let p2 = html2canvas(document.getElementById('imagemapwrapper'));
     let p3 = html2canvas(document.getElementById('myPieChartId'));    
@@ -48,7 +31,6 @@ const onSave = () => {
         let y = 10;
         var pageHeight= doc.internal.pageSize.height;
         console.log('All promises done', allPromises);
-        //addSvg(doc);
         allPromises.forEach(canvas => {
             
             if (y >= pageHeight)
@@ -66,31 +48,17 @@ const onSave = () => {
         
         doc.save('test.pdf');
     });
-
-
-    console.log('end save');
 }
 
-const addSvg = (doc) => {
-    debugger
-    let elem = document.getElementById('myImageMap');
-    // var svgAsText = new XMLSerializer().serializeToString(elem);
-    // doc.addSVG(svgAsText, 10, 10, 100, 100)
-    
-    
-    var svg = elem.innerHTML;
-    svg = svg.replace(/\r?\n|\r/g, '').trim();
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    canvgX.fromString(context, svg);
-    debugger
-
-    var imgData = canvas.toDataURL('image/png');
-    doc.addImage(imgData, 'PNG', 0, 0, 100, 100);
+// Try jsPdf's toHtml function
+// Result: All CSS styling not applied
+// But the text data are there, and there is pagination
+const tryHtmlRender = () => {
+    let rootElem = document.getElementById('root');
+    doc.fromHTML(rootElem);
+    doc.save('testHtml.pdf');
 }
-
 
 
 ReactDOM.render(<App onSave={onSave}/>, document.getElementById('root'));
+//ReactDOM.render(<ReportApp/>, document.getElementById('root'));
